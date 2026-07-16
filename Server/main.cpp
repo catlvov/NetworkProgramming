@@ -92,12 +92,17 @@ void main()
 	else if (iResult == 0) cout << "Nothinf received< connection cloin" << endl;
 	else cout << "Receive failed with error: " << WSAGetLastError() << endl;
 
+	//7) отправка данных клиенту 
 	cin.get();
-
-	//7) 
+	CHAR send_buffer[MTU] = "Привет Клиент, Ваше сообщение: ";
+	sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s" , recv_buffer);
+	iResult = send(client_soket, send_buffer, strlen(send_buffer), NULL);
+	if (iResult == SOCKET_ERROR)
+		cout << "send() faiked with error; "
+	//8) 
 	iResult = shutdown(client_soket, SD_BOTH);
 	if (iResult)cout << "shutdown failed with error: " << WSAGetLastError() << endl;
-	//8) освоболить русурсы
+	//9) освоболить русурсы
 	closesocket(client_soket);
 	closesocket(listen_socket);
 	freeaddrinfo(target);
