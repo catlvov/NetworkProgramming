@@ -35,7 +35,8 @@ void main()
 	iResult = getaddrinfo(NULL, "27015", &hints, &target);  // NULL - '0,0,0,0'. 
 	if (iResult)
 	{
-		cout << "hetaddrinfo() failed with error:" << iResult << endl;
+		cout << "getaddrinfo() failed with error:" << iResult << endl;
+		cout << "функция getaddrinfo() завершилась с ошибкой:" << iResult << endl;
 		WSACleanup();
 		return;
 	}
@@ -44,7 +45,8 @@ void main()
 	SOCKET listen_socket = socket(target->ai_family, target->ai_socktype, target->ai_protocol);
 	if (listen_socket == INVALID_SOCKET)
 	{
-		cout << "LISTEM SOKET creation failed with error: " << WSAGetLastError() << endl;
+		cout << "LISTEM SOKET() creation failed with error: " << WSAGetLastError() << endl;
+		cout << "функция LISTEM SOKET() завершилась с ошибкой:" << WSAGetLastError() << endl;
 		freeaddrinfo(target);
 		WSACleanup();
 		return;
@@ -55,6 +57,7 @@ void main()
 	if (iResult)
 	{
 		cout << "BIND failed with error" << WSAGetLastError() << endl;
+		cout << "Привязка сокета к порту завершилась с ошибкой" << WSAGetLastError() << endl;
 		closesocket(listen_socket);
 		freeaddrinfo(target);
 		WSACleanup();
@@ -65,6 +68,7 @@ void main()
 	if (listen(listen_socket, 1) == SOCKET_ERROR)
 	{
 		cout << "Listen faiked with error: " << WSAGetLastError() << endl;
+		cout << "Прослушивать порт невозможно иза ошибки: " << WSAGetLastError() << endl;
 		closesocket(listen_socket);
 		freeaddrinfo(target);
 		WSACleanup();
@@ -76,6 +80,7 @@ void main()
 	if (client_soket == INVALID_SOCKET)
 	{
 		cout << "Accept failed with error: " << WSAGetLastError() << endl;
+		cout << "Не удалось принять подключение от клиента: " << WSAGetLastError() << endl;
 		closesocket(listen_socket);
 		freeaddrinfo(target);
 		WSACleanup();
@@ -89,19 +94,27 @@ void main()
 		cout << iResult << "Bytes received. message: " << recv_buffer << endl;
 
 	}
-	else if (iResult == 0) cout << "Nothinf received< connection cloin" << endl;
-	else cout << "Receive failed with error: " << WSAGetLastError() << endl;
+	else if (iResult == 0) cout << "Nothinf received, connection cloin \n нет данных от клиента" << endl;
+	else
+	{
+		cout << "Receive failed with error: " << WSAGetLastError() << endl;
+		cout << "При получении данных возникла: " << WSAGetLastError() << endl;
+	}
 
 	//7) отправка данных клиенту 
 	cin.get();
 	CHAR send_buffer[MTU] = "Привет Клиент, Ваше сообщение: ";
 	sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s" , recv_buffer);
 	iResult = send(client_soket, send_buffer, strlen(send_buffer), NULL);
-	if (iResult == SOCKET_ERROR)
-		cout << "send() faiked with error; "
+	if (iResult == SOCKET_ERROR) 
+		cout << "send() faiked with error; ";
 	//8) 
 	iResult = shutdown(client_soket, SD_BOTH);
-	if (iResult)cout << "shutdown failed with error: " << WSAGetLastError() << endl;
+	if (iResult)
+	{
+		cout << "shutdown failed with error: " << WSAGetLastError() << endl;
+		cout << "приотправке данных возникла ошибка " << WSAGetLastError() << endl;
+	}
 	//9) освоболить русурсы
 	closesocket(client_soket);
 	closesocket(listen_socket);
