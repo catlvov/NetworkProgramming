@@ -121,6 +121,7 @@ void main()
 			cout << FormatLastError(WSAGetLastError(), szError) << endl;
 			cout << "Receive failed with error: " << WSAGetLastError() << endl;
 			cout << "При получении данных возникла: " << WSAGetLastError() << endl;
+			break;
 		}
 
 		//7) отправка данных клиенту 
@@ -134,6 +135,7 @@ void main()
 		}
 	} while (true);
 	//8) 
+	cout << "Press 'Enter' to close connection" << endl; cin.get();
 	iResult = shutdown(client_soket, SD_BOTH);
 	if (iResult)
 	{
