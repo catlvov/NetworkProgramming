@@ -1,4 +1,8 @@
-﻿#include <iostream>
+﻿#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <iostream>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <iphlpapi.h>
@@ -86,25 +90,32 @@ void main()
 
 	//4) Отправка данных на Сервер:
 	CHAR send_buffer[MTU] = "Привет Сервер!";
-	iResult = send(connect_socket, send_buffer, strlen(send_buffer), 0);
-	if (iResult == SOCKET_ERROR)
+	do
 	{
-		cout << "Send failed with error: " << WSAGetLastError() << endl;
-		cout << FormatLastError(dwError, szError) << endl;
-		closesocket(connect_socket);
-		WSACleanup();
-		return;
-	}
-	cout << "Sent " << iResult << " Bytes" << endl;
+		iResult = send(connect_socket, send_buffer, strlen(send_buffer), 0);
+		if (iResult == SOCKET_ERROR)
+		{
+			cout << "Send failed with error: " << WSAGetLastError() << endl;
+			cout << FormatLastError(dwError, szError) << endl;
+			closesocket(connect_socket);
+			WSACleanup();
+			return;
+		}
+		cout << "Sent " << iResult << " Bytes" << endl;
 
-	//5) Получение данных от Сервера:
-	CHAR recv_buffer[MTU] = {};
-	iResult = recv(connect_socket, recv_buffer, MTU, NULL);
-	dwError = WSAGetLastError();
-	if (iResult > 0)cout << iResult << "Byte received. Message: " << recv_buffer << endl;
-	else if (iResult == 0)cout << "Nothing received." << endl;
-	else cout << "Receive failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError,szError) << endl;
-	cin.get();
+		//5) Получение данных от Сервера:
+		CHAR recv_buffer[MTU] = {};
+		iResult = recv(connect_socket, recv_buffer, MTU, NULL);
+		dwError = WSAGetLastError();
+		if (iResult > 0)cout << iResult << "Byte received. Message: " << recv_buffer << endl;
+		else if (iResult == 0)cout << "Nothing received." << endl;
+		else cout << "Receive failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError) << endl;
+		ZeroMemory(send_buffer, strlen(send_buffer));
+		cout << "Видите Сообщение: ";  
+		SetConsoleCP(1251);
+		cin.getline(send_buffer, MTU);
+		SetConsoleCP(866);
+	} while (strcmp(send_buffer, "exit"));
 	//6) Завершаем сеанс работы с Сервером и освобождаем ресурсы:
 	iResult = shutdown(connect_socket, SD_BOTH);
 	if (iResult == SOCKET_ERROR)cout << "Shutdown failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError);

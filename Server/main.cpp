@@ -1,3 +1,4 @@
+
 #include<iostream>
 #include<WinSock2.h>
 #include<WS2tcpip.h>
@@ -101,31 +102,37 @@ void main()
 		return;
 	}
 	//6) получение и отправка данных от клиента 
+	CHAR send_buffer[MTU] = {};
 	CHAR recv_buffer[MTU] = {};
-	iResult = recv(client_soket,recv_buffer, MTU, NULL);
-	if (iResult > 0)
+	
+	do
 	{
-		cout << iResult << "Bytes received. message: " << recv_buffer << endl;
+		ZeroMemory(send_buffer, MTU);
+		ZeroMemory(recv_buffer, MTU);
+		iResult = recv(client_soket, recv_buffer, MTU, NULL);
+		if (iResult > 0)
+		{
+			cout << iResult << "Bytes received. message: " << recv_buffer << endl;
 
-	}
-	else if (iResult == 0) cout << "Nothinf received, connection cloin \n нет данных от клиента" << endl;
-	else
-	{
-		cout << FormatLastError(WSAGetLastError(), szError) << endl;
-		cout << "Receive failed with error: " << WSAGetLastError() << endl;
-		cout << "При получении данных возникла: " << WSAGetLastError() << endl;
-	}
+		}
+		else if (iResult == 0) cout << "Nothinf received, connection cloin \n нет данных от клиента" << endl;
+		else
+		{
+			cout << FormatLastError(WSAGetLastError(), szError) << endl;
+			cout << "Receive failed with error: " << WSAGetLastError() << endl;
+			cout << "При получении данных возникла: " << WSAGetLastError() << endl;
+		}
 
-	//7) отправка данных клиенту 
-	/*cin.get();*/
-	CHAR send_buffer[MTU] = "Привет Клиент, Ваше сообщение: ";
-	sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s" , recv_buffer);
-	iResult = send(client_soket, send_buffer, strlen(send_buffer), NULL);
-	if (iResult == SOCKET_ERROR)
-	{
-		cout << FormatLastError(WSAGetLastError(), szError) << endl;
-		cout << "send() faiked with error; ";
-	}
+		//7) отправка данных клиенту 
+		/*cin.get();*/
+		sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s", recv_buffer);
+		iResult = send(client_soket, send_buffer, strlen(send_buffer), NULL);
+		if (iResult == SOCKET_ERROR)
+		{
+			cout << FormatLastError(WSAGetLastError(), szError) << endl;
+			cout << "send() faiked with error; ";
+		}
+	} while (true);
 	//8) 
 	iResult = shutdown(client_soket, SD_BOTH);
 	if (iResult)
