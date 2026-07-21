@@ -104,7 +104,7 @@ void main()
 	if (iResult > 0)cout << iResult << "Byte received. Message: " << recv_buffer << endl;
 	else if (iResult == 0)cout << "Nothing received." << endl;
 	else cout << "Receive failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError,szError) << endl;
-
+	cin.get();
 	//6) Завершаем сеанс работы с Сервером и освобождаем ресурсы:
 	iResult = shutdown(connect_socket, SD_BOTH);
 	if (iResult == SOCKET_ERROR)cout << "Shutdown failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError);

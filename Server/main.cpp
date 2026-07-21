@@ -36,7 +36,7 @@ void main()
 	hints.ai_protocol	 = IPPROTO_TCP;
 	hints.ai_flags		 = AI_PASSIVE;
 
-	iResult = getaddrinfo(NULL, "445", &hints, &target);  // NULL - '0,0,0,0'. 
+	iResult = getaddrinfo(NULL, "27015", &hints, &target);  // NULL - '0,0,0,0'. 
 	if (iResult)
 	{
 		cout << "getaddrinfo() failed with error:" << iResult << endl;
@@ -85,7 +85,11 @@ void main()
 	}
 
 	//5 принимаем подклбчение от клиентов 
-	SOCKET client_soket = accept(listen_socket, NULL, NULL);
+	sockaddr_in client_address;
+	int client_address_len = sizeof(client_address);
+	SOCKET client_soket = accept(listen_socket, (SOCKADDR*)&client_address, &client_address_len);
+	//cout << client_address.sa_data << endl;
+	cout << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << endl;
 	if (client_soket == INVALID_SOCKET)
 	{
 		cout << FormatLastError(WSAGetLastError(), szError) << endl;
@@ -113,7 +117,7 @@ void main()
 	}
 
 	//7) отправка данных клиенту 
-	cin.get();
+	/*cin.get();*/
 	CHAR send_buffer[MTU] = "Привет Клиент, Ваше сообщение: ";
 	sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s" , recv_buffer);
 	iResult = send(client_soket, send_buffer, strlen(send_buffer), NULL);
