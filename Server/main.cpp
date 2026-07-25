@@ -142,6 +142,14 @@ void main()
 	WSACleanup();
 }
 
+INT GetClientPosition(DWORD dwID)
+{
+	for (int i = 0; i < MAX_CONNECTIONS; i++)
+	{
+		if (g_dwThreadIDs[i] == dwID)return i;
+	}
+}
+
 VOID ClientHandler(SOCKET client_socket)
 {
 	SOCKADDR_IN client_address;
@@ -169,6 +177,8 @@ VOID ClientHandler(SOCKET client_socket)
 			if (iResult > 0)
 			{
 				cout <<  sz_client_address << recv_buffer << " (" << iResult << "Bytes);" << endl;
+				cout << "\tThreadID: " << GetCurrentThreadId << "\tPosition: " << GetClientPosition(GetCurrentThreadId());
+				cout << endl;
 				//1cout << iResult << "Bytes received. message: " << recv_buffer << endl;
 			}
 			else if (iResult == 0) cout << "Nothinf received, connection cloin \n нет данных от клиента" << endl;
