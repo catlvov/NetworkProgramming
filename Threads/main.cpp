@@ -5,19 +5,28 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+BOOL finish = FALSE;
+HANDLE g_hMutex = NULL;
+
 void plus()
 {
-	while (true)
+	while (!finish)
 	{
+		WaitForSingleObject(g_hMutex, INFINITE);
 		cout << "+ ";
+		Sleep(100);
+		ReleaseMutex(g_hMutex);
 	}
 }
 
 void minus()
 {
-	while (true)
+	while (!finish)
 	{
+		WaitForSingleObject(g_hMutex, INFINITE);
 		cout << "- ";
+		Sleep(100);
+		ReleaseMutex(g_hMutex);
 	}
 }
 
@@ -26,6 +35,7 @@ void main()
 	setlocale(LC_ALL, "");
 	/*plus();
 	minus();*/
+	g_hMutex = CreateMutex(NULL, NULL, "Mutex");
 	HANDLE hThreads[2] = {};
 	hThreads[0] = CreateThread
 	(
@@ -46,8 +56,9 @@ void main()
 		NULL
 	);
 	cin.get();
+	finish = TRUE;
 	WaitForMultipleObjects(2, hThreads, TRUE, INFINITE);
 	CloseHandle(hThreads[0]);
 	CloseHandle(hThreads[1]);
-
+	CloseHandle(g_hMutex);
 }

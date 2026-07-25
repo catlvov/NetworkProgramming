@@ -89,7 +89,7 @@ void main()
 	}
 
 	//4) Отправка данных на Сервер:
-	CHAR send_buffer[MTU] = "Привет Сервер!";
+	CHAR send_buffer[MTU] = "Hello server! How Are you?";
 	do
 	{
 		iResult = send(connect_socket, send_buffer, strlen(send_buffer), 0);
