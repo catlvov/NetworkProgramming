@@ -177,6 +177,23 @@ VOID Shift(INT position)
 	}
 }
 
+VOID broadcast(CHAR send_buffer[],INT sender_index)
+{
+	CHAR szError[256] = {};
+	for (INT i = 0; i < n; i++)
+	{
+		if (true)
+		{
+			INT iResult = send(g_hSockets[i], send_buffer, strlen(send_buffer), NULL);
+			if (iResult == SOCKET_ERROR)
+			{
+				cout << FormatLastError(WSAGetLastError(), szError) << endl;
+				cout << "send() faiked with error; ";
+			}
+		}
+	}
+}
+
 VOID ClientHandler(SOCKET client_socket)
 {
 	SOCKADDR_IN client_address;
@@ -203,8 +220,8 @@ VOID ClientHandler(SOCKET client_socket)
 			iResult = recv(client_socket, recv_buffer, MTU, NULL);
 			if (iResult > 0)
 			{
-				cout <<  sz_client_address << recv_buffer << " (" << iResult << "Bytes);" << endl;
-				cout << "\tThreadID: " << GetCurrentThreadId << "\tPosition: " << GetClientPosition(GetCurrentThreadId());
+				cout <<  sz_client_address << recv_buffer << " (" << iResult << "Bytes);";
+				//cout << "\tThreadID: " << GetCurrentThreadId << "\tPosition: " << GetClientPosition(GetCurrentThreadId());
 				cout << endl;
 				//1cout << iResult << "Bytes received. message: " << recv_buffer << endl;
 			}
@@ -218,14 +235,18 @@ VOID ClientHandler(SOCKET client_socket)
 			}
 
 			//7) отправка данных клиенту 
+			sprintf(send_buffer, "%s - %s\n", sz_client_address, recv_buffer);
+			broadcast(send_buffer, GetClientPosition(GetCurrentThreadId()));
+
 			/*cin.get();*/
-			sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s", recv_buffer);
+			/*sprintf(send_buffer, "Привет Клиент, Ваше сообщение: %s", recv_buffer);
 			iResult = send(client_socket, send_buffer, strlen(send_buffer), NULL);
 			if (iResult == SOCKET_ERROR)
 			{
 				cout << FormatLastError(WSAGetLastError(), szError) << endl;
 				cout << "send() faiked with error; ";
-			}
+			}*/
+
 		} while (true);
 		//8) 
 		//cout << "Press 'Enter' to close connection" << endl; cin.get();
