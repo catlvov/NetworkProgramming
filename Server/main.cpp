@@ -1,4 +1,8 @@
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif //!WIN32_LEAN_AND_MEAN
 
+#include<Windows.h>
 #include<iostream>
 #include<WinSock2.h>
 #include<WS2tcpip.h>
@@ -23,6 +27,7 @@ SOCKET g_hSockets[MAX_CONNECTIONS] = {};
 INT n = 0;
 
 VOID ClientHandler(SOCKET client_socket);
+VOID PrintActiveClientsCount();
 
 void main()
 {
@@ -98,6 +103,7 @@ void main()
 	//5 принимаем подклбчение от клиентов 
 	do
 	{
+		PrintActiveClientsCount();
 		sockaddr_in client_address;
 		int client_address_len = sizeof(client_address);
 		SOCKET client_socket = accept(listen_socket, (SOCKADDR*)&client_address, &client_address_len);
@@ -140,6 +146,16 @@ void main()
 	closesocket(listen_socket);
 	freeaddrinfo(target);
 	WSACleanup();
+}
+
+VOID PrintActiveClientsCount()
+{
+	HANDLE hConcole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	GetConsoleScreenBufferInfo(hConcole, &info);
+	SetConsoleCursorPosition(hConcole, COORD{ 25,0 });
+	cout << "количество подлюченых клиентов: " << n << endl;
+	SetConsoleCursorPosition(hConcole, info.dwCursorPosition);
 }
 
 INT GetClientPosition(DWORD dwID)
