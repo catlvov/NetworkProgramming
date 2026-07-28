@@ -18,6 +18,8 @@ using std::endl;
 #define MTU		1500	
 
 //CHAR* FormatLastError(DWORD dwError, CHAR szError[]);
+BOOL finish = FALSE;
+VOID resive(SOCKET connect_socket);
 
 void main()
 {
@@ -88,6 +90,15 @@ void main()
 		return;
 	}
 
+	HANDLE  hReceiveThread = CreateThread
+	(
+		NULL,
+		0,
+		(LPTHREAD_START_ROUTINE)receive,
+		(LPVOID) & connect_socket,
+		NULL,
+		0
+	);
 	//4) Отправка данных на Сервер:
 	CHAR send_buffer[MTU] = "Hello server! How Are you?";
 	do
@@ -104,24 +115,46 @@ void main()
 		cout << "Sent " << iResult << " Bytes" << endl;
 
 		//5) Получение данных от Сервера:
-		CHAR recv_buffer[MTU] = {};
-		iResult = recv(connect_socket, recv_buffer, MTU, NULL);
-		dwError = WSAGetLastError();
-		if (iResult > 0)cout << iResult << "Byte received. Message: " << recv_buffer << endl;
-		else if (iResult == 0)cout << "Nothing received." << endl;
-		else cout << "Receive failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError) << endl;
+		resive(connect_socket);
+
 		ZeroMemory(send_buffer, strlen(send_buffer));
-		cout << "Видите Сообщение: ";  
+		cout << "Видите Сообщение: ";
 		SetConsoleCP(1251);
 		cin.getline(send_buffer, MTU);
 		SetConsoleCP(866);
 	} while (strcmp(send_buffer, "exit"));
+	finish = TRUE;
+	CloseHandle(hReceiveThread);
+
+	WaitForSingleObject(hReceiveThread, INFINITE);
+
 	//6) Завершаем сеанс работы с Сервером и освобождаем ресурсы:
 	iResult = shutdown(connect_socket, SD_BOTH);
 	if (iResult == SOCKET_ERROR)cout << "Shutdown failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError);
 	closesocket(connect_socket);
 	WSACleanup();
 }
+
+
+
+VOID receive(SOCKET connect_socket)
+{
+	cout << "connect_socket: " << connect_socket << endl;
+	DWORD dwError;
+	CHAR szError[256] = {};
+	INT iResult = 0;
+	CHAR recv_buffer[MTU] = {};
+	do
+	{
+		iResult = recv(connect_socket, recv_buffer, MTU, NULL);
+		dwError = WSAGetLastError();
+		if (iResult > 0)cout << iResult << "Byte received. Message: " << recv_buffer << endl;
+		else if (iResult == 0)cout << "Nothing received." << endl;
+		else cout << "Receive failed with error: " << WSAGetLastError() << endl << FormatLastError(dwError, szError) << endl;
+		if (WSAGetLastError() = 10053)break;
+	} while (!finish);
+}
+
 //
 //CHAR* FormatLastError(DWORD dwError, CHAR szError[])
 //{

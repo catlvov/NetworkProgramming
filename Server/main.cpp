@@ -221,7 +221,7 @@ VOID ClientHandler(SOCKET client_socket)
 			if (iResult > 0)
 			{
 				cout <<  sz_client_address << recv_buffer << " (" << iResult << "Bytes);";
-				//cout << "\tThreadID: " << GetCurrentThreadId << "\tPosition: " << GetClientPosition(GetCurrentThreadId());
+				cout << "\t\tThreadID: " << GetCurrentThreadId << "\tPosition: " << GetClientPosition(GetCurrentThreadId());
 				cout << endl;
 				//1cout << iResult << "Bytes received. message: " << recv_buffer << endl;
 			}
@@ -235,7 +235,7 @@ VOID ClientHandler(SOCKET client_socket)
 			}
 
 			//7) отправка данных клиенту 
-			sprintf(send_buffer, "%s - %s\n", sz_client_address, recv_buffer);
+			sprintf(send_buffer, "%s%s\n", sz_client_address, recv_buffer);
 			broadcast(send_buffer, GetClientPosition(GetCurrentThreadId()));
 
 			/*cin.get();*/
