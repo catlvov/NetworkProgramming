@@ -27,7 +27,7 @@ SOCKET g_hSockets[MAX_CONNECTIONS] = {};
 INT n = 0;
 
 VOID ClientHandler(SOCKET client_socket);
-VOID PrintActiveClientsCount();
+VOID ShowActiveClients();
 
 void main()
 {
@@ -103,7 +103,7 @@ void main()
 	//5 принимаем подклбчение от клиентов 
 	do
 	{
-		PrintActiveClientsCount();
+		ShowActiveClients();
 		sockaddr_in client_address;
 		int client_address_len = sizeof(client_address);
 		SOCKET client_socket = accept(listen_socket, (SOCKADDR*)&client_address, &client_address_len);
@@ -148,8 +148,9 @@ void main()
 	WSACleanup();
 }
 
-VOID PrintActiveClientsCount()
+VOID ShowActiveClients()
 {
+	Sleep(10);
 	HANDLE hConcole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	GetConsoleScreenBufferInfo(hConcole, &info);
